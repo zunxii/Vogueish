@@ -1,11 +1,11 @@
 import React from 'react'
 
-const wishlist = () => {
+const page = () => {
   return (
     <div>
-      wishlist
+      
     </div>
   )
 }
 
-export default wishlist
+export default page

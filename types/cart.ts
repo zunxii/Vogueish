@@ -1,34 +1,38 @@
+// types/cart.ts
 export interface CartItem {
   id: string;
   productId: string;
   name: string;
+  brand: string;
+  color?: string;
+  size: string;
+  price: number;
+  quantity: number;
+  image: string;
+  slug: string;
+  inStock: boolean;
+}
+
+export interface Coupon {
+  code: string;
+  discount: number;
+  description: string;
+  minOrder?: number;
+  maxDiscount?: number;
+}
+
+export interface WishlistItem {
+  id: string;
+  name: string;
+  brand: string;
   price: number;
   image: string;
-  color: string;
-  size: string;
-  quantity: number;
-  customTailoring?: CustomTailoringDetails;
-  isHomeTrial?: boolean;
+  slug: string;
 }
 
-export interface CustomTailoringDetails {
-  measurements: {
-    chest?: number;
-    waist?: number;
-    hip?: number;
-    length?: number;
-    shoulders?: number;
-    sleeves?: number;
-  };
-  fabric?: string;
-  style?: string;
-  additionalNotes?: string;
-  additionalCost: number;
-}
-
-export interface HomeTrialDetails {
-  trialPeriod: number; // days
-  trialFee: number;
-  deliveryDate: string;
-  returnDate: string;
+export interface CartState {
+  items: CartItem[];
+  appliedCoupon: string;
+  discount: number;
+  discountType: 'percentage' | 'flat';
 }
