@@ -3,20 +3,20 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+// import { useSession } from 'next-auth/react';
+// import { redirect } from 'next/navigation';
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   
   if (status === "loading") {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
   
-  if (status === "unauthenticated" || !session) {
-    redirect("/seller-sign-in");
-    return null;
-  }
+  // if (status === "unauthenticated" || !session) {
+  //   redirect("/seller-sign-in");
+  //   return null;
+  // }
   return (
     <div className="p-6 md:p-10">
       <div className="flex items-center justify-between mb-8">
