@@ -1,239 +1,246 @@
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  BuyerSignInFormData, 
-  BuyerSignUpFormData,
-  SellerStep1FormData,
-  SellerStep2FormData
-} from "@/types/authTypes";
+import { useState } from "react";
 
-export const useAuth = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sessionData, setSessionData] = useState<any>(null);
+export function useAuth() {
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Buyer sign in
-  const buyerSignIn = async (data: BuyerSignInFormData) => {
+  const buyerSignIn = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn("buyer-signin", {
+        email,
+        password,
         redirect: false,
-        email: data.email,
-        password: data.password,
-        role: "buyer",
       });
-      
+
       if (result?.error) {
-        setError("Invalid email or password");
-        return false;
+        setError(result.error);
+        return { success: false, error: result.error };
+      }
+
+      if (result?.ok) {
+        router.push("/shop");
+        return { success: true };
       }
       
+      return { success: false, error: "Sign in failed" };
+    } catch (error: any) {
+      const errorMessage = error.message || "Sign in failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sellerSignIn = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const result = await signIn("seller-signin", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError(result.error);
+        return { success: false, error: result.error };
+      }
+
+      if (result?.ok) {
+        router.push("/seller-dashboard");
+        return { success: true };
+      }
+      
+      return { success: false, error: "Sign in failed" };
+    } catch (error: any) {
+      const errorMessage = error.message || "Sign in failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buyerSignUp = async (userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+  }) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch("/api/auth/buyer/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = data.error || "Sign up failed";
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      // Auto sign in after successful registration
+      const signInResult = await buyerSignIn(userData.email, userData.password);
+      return signInResult;
+    } catch (error: any) {
+      const errorMessage = error.message || "Sign up failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sellerSignUpStep1 = async (userData: {
+    email: string;
+    phone: string;
+    gst: string;
+    otp: string;
+  }) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch("/api/auth/seller/signup/step1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = data.error || "Step 1 failed";
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true, tempToken: data.tempToken };
+    } catch (error: any) {
+      const errorMessage = error.message || "Step 1 failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sellerSignUpStep2 = async (userData: {
+    businessName: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    tempToken: string;
+  }) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch("/api/auth/seller/signup/step2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = data.error || "Step 2 failed";
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true, step3Token: data.step3Token };
+    } catch (error: any) {
+      const errorMessage = error.message || "Step 2 failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sellerSignUpStep3 = async (userData: {
+    password: string;
+    confirmPassword: string;
+    step3Token: string;
+  }) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch("/api/auth/seller/signup/step3", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = data.error || "Registration failed";
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      const errorMessage = error.message || "Registration failed";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      await signOut({ redirect: false });
       router.push("/");
-      return true;
-    } catch (error) {
-      setError("An unexpected error occurred");
-      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Buyer sign up
-  const buyerSignUp = async (data: BuyerSignUpFormData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch("/api/auth/buyer/sign-up", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        setError(result.error || "Failed to create account");
-        return false;
-      }
-      
-      // Automatically sign in after successful sign up
-      return await buyerSignIn({
-        email: data.email,
-        password: data.password,
-      });
-    } catch (error) {
-      setError("An unexpected error occurred");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Send OTP
-  const sendOTP = async (phone: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch("/api/auth/send-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ phone }),
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        setError(result.error || "Failed to send OTP");
-        return false;
-      }
-      
-      // If we have the OTP in development mode, show it
-      if (result.otp && process.env.NODE_ENV === "development") {
-        console.log("Development OTP:", result.otp);
-      }
-      
-      return true;
-    } catch (error) {
-      setError("Failed to send OTP");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Seller step 1 - Updated to use the step1 specific endpoint
-  const sellerStep1 = async (data: SellerStep1FormData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Submit step 1 data to the step1-specific endpoint
-      const response = await fetch("/api/auth/seller/sign-up/step1", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        setError(result.error || "Failed to process step 1");
-        return false;
-      }
-      
-      // Store validated data for step 2
-      setSessionData(result.validatedData);
-      return true;
-    } catch (error) {
-      setError("An unexpected error occurred");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Seller step 2 - Updated to use the step2 specific endpoint
-  const sellerStep2 = async (data: SellerStep2FormData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    if (!sessionData) {
-      setError("Missing session data from step 1");
-      setIsLoading(false);
-      return false;
-    }
-    
-    try {
-      const response = await fetch("/api/auth/seller/sign-up/step2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          step1Data: sessionData
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        setError(result.error || "Failed to create seller account");
-        return false;
-      }
-      
-      // Automatically sign in after successful sign up
-      const signInResult = await signIn("credentials", {
-        redirect: false,
-        email: sessionData.email,
-        password: data.password,
-        role: "seller",
-      });
-      
-      if (signInResult?.error) {
-        setError("Account created but sign-in failed");
-        return false;
-      }
-      
-      router.push("/seller-dashboard");
-      return true;
-    } catch (error) {
-      setError("An unexpected error occurred");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Seller sign in
-  const sellerSignIn = async (data: BuyerSignInFormData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-        role: "seller",
-      });
-      
-      if (result?.error) {
-        setError("Invalid email or password");
-        return false;
-      }
-      
-      router.push("/seller-dashboard");
-      return true;
-    } catch (error) {
-      setError("An unexpected error occurred");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const clearError = () => setError(null);
 
   return {
-    isLoading,
+    // Session data
+    user: session?.user,
+    isAuthenticated: !!session,
+    isLoading: status === "loading" || isLoading,
     error,
+    clearError,
+    
+    // User role helpers
+    isBuyer: session?.user?.role === "buyer",
+    isSeller: session?.user?.role === "seller",
+    
+    // Auth methods
     buyerSignIn,
-    buyerSignUp,
     sellerSignIn,
-    sellerStep1,
-    sellerStep2,
-    sendOTP,
-    sessionData,
+    buyerSignUp,
+    sellerSignUpStep1,
+    sellerSignUpStep2,
+    sellerSignUpStep3,
+    logout,
   };
-};
+}

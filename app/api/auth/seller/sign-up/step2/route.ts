@@ -1,21 +1,15 @@
-// app/api/auth/seller/sign-up/step2/route.ts
+// app/api/auth/seller/signup/step2/route.ts
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { User, Seller } from '@/models/UserSchema';
+import { User } from '@/models/UserSchema';
 import { sellerStep2Schema } from '@/schemas/authSchema';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     
-    // Validate password data
-    const validationResult = sellerStep2Schema.safeParse({
-      password: body.password,
-      confirmPassword: body.confirmPassword
-    });
-    
+    // Validate business info
+    const validationResult = sellerStep2Schema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
         { error: validationResult.error.errors[0].message },
@@ -23,13 +17,30 @@ export async function POST(req: Request) {
       );
     }
     
-    const { password } = validationResult.data;
-    const { step1Data } = body;
+    const { businessName, address, city, state, pincode, tempToken } = body;
     
-    // Verify step1 data is present
-    if (!step1Data || !step1Data.email || !step1Data.phone || !step1Data.gst) {
+    // Verify and decode tempToken from step 1
+    if (!tempToken) {
       return NextResponse.json(
-        { error: 'Missing registration data. Please complete step 1 first.' },
+        { error: 'Missing registration token. Please complete step 1 first.' },
+        { status: 400 }
+      );
+    }
+    
+    let step1Data;
+    try {
+      step1Data = JSON.parse(Buffer.from(tempToken, 'base64').toString());
+      
+      // Check if token is expired
+      if (Date.now() > step1Data.expires) {
+        return NextResponse.json(
+          { error: 'Registration session expired. Please start over from step 1.' },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid registration token' },
         { status: 400 }
       );
     }
@@ -38,55 +49,43 @@ export async function POST(req: Request) {
     
     await connectDB();
     
-    // Check again if user already exists (race condition protection)
-    const existingUser = await User.findOne({ email });
+    // Check again if user already exists
+    const existingUser = await User.findOne({ 
+      $or: [
+        { email, role: 'seller' },
+        { phone, role: 'seller' }
+      ]
+    });
+    
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already in use' },
+        { error: 'Email or phone already in use' },
         { status: 409 }
       );
     }
     
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create new user
-    const newUser = new User({
+    // Create new temp token for step 3 with all data
+    const step3Token = Buffer.from(JSON.stringify({
       email,
-      password: hashedPassword,
       phone,
-      role: 'seller',
-    });
-    
-    await newUser.save();
-    
-    // Create seller profile
-    const newSeller = new Seller({
-      userId: newUser._id,
       gst,
-      isVerified: false,
-      stores: [],
-      products: [],
-      onboardingComplete: false,
-    });
-    
-    await newSeller.save();
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: newUser._id, email, role: 'seller' },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '7d' }
-    );
+      businessName,
+      address,
+      city,
+      state,
+      pincode,
+      timestamp: Date.now(),
+      expires: Date.now() + (10 * 60 * 1000) // 10 minutes
+    })).toString('base64');
     
     return NextResponse.json(
       { 
         success: true,
-        message: 'Seller account created successfully',
-        userId: newUser._id.toString(),
-        token
+        message: 'Step 2 completed successfully',
+        step3Token,
+        businessInfo: { businessName, address, city, state, pincode }
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error('Error in seller step 2:', error);

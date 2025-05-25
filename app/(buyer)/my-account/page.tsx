@@ -11,15 +11,15 @@ const MyAccount = () => {
   const [orders, setOrders] = useState([]);
 
   // Simulate authentication check
-//   useEffect(() => {
-//     const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
-//     if (!loggedInUser) {
-//       router.push("/buyer/signin"); // Redirect if not logged in
-//     } else {
-//       setUser(loggedInUser);
-//       fetchOrders();
-//     }
-//   }, []);
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
+    if (!loggedInUser) {
+      router.push("/buyer/signin"); // Redirect if not logged in
+    } else {
+      setUser(loggedInUser);
+      fetchOrders();
+    }
+  }, []);
 
   // Fetch orders (simulate API call)
   const fetchOrders = async () => {

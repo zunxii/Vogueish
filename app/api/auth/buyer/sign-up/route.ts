@@ -1,82 +1,84 @@
-import { connectDB } from '@/lib/db';
-import { User, Buyer } from '@/models/UserSchema';
-import { buyerSignUpSchema } from '@/schemas/authSchema';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
+// app/api/auth/buyer/signup/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/db";
+import { User } from "@/models/UserSchema";
+import bcrypt from "bcryptjs";
+import { buyerSignUpSchema } from "@/schemas/authSchema";
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await request.json();
+    console.log("Received signup data:", body);
     
-    // Validate input data
-    const validationResult = buyerSignUpSchema.safeParse(body);
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { error: validationResult.error.errors[0].message },
-        { status: 400 }
-      );
-    }
-    
-    const { name, email, password, phone } = validationResult.data;
+    // Validate input
+    const validatedData = buyerSignUpSchema.parse(body);
     
     await connectDB();
     
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ 
+      email: validatedData.email 
+    });
+    
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already in use' },
-        { status: 409 }
+        { error: "User with this email already exists" },
+        { status: 400 }
       );
     }
     
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12);
     
-    // Create new user
-    const newUser = new User({
-      email,
+    // Create user
+    const user = new User({
+      email: validatedData.email,
       password: hashedPassword,
-      name,
-      phone,
-      role: 'buyer',
+      firstName: validatedData.firstName,
+      lastName: validatedData.lastName,
+      phone: validatedData.phone || undefined, // Only include if provided
+      role: "buyer",
+      isVerified: true, // Set to false if you want email verification
     });
     
-    await newUser.save();
+    await user.save();
     
-    // Create buyer profile
-    const newBuyer = new Buyer({
-      userId: newUser._id,
-      addresses: [],
-      wishlist: [],
-      orders: [],
-    });
-    
-    await newBuyer.save();
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: newUser._id, email, role: 'buyer' },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '7d' }
-    );
+    console.log("User created successfully:", user._id);
     
     return NextResponse.json(
       { 
-        success: true,
-        message: 'Buyer account created successfully',
-        userId: newUser._id.toString(),
-        token,
-        name,
-        email
+        message: "Account created successfully",
+        userId: user._id.toString()
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error('Error creating buyer:', error);
+    
+  } catch (error: any) {
+    console.error("Buyer signup error:", error);
+    
+    if (error.name === 'ZodError') {
+      return NextResponse.json(
+        { 
+          error: "Invalid input data", 
+          details: error.errors.map((err: any) => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (error.code === 11000) {
+      // MongoDB duplicate key error
+      return NextResponse.json(
+        { error: "User with this email already exists" },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

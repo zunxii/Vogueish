@@ -1,8 +1,7 @@
-// models/UserSchema.ts
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose, { model, models, Schema } from "mongoose";
 
-// Base user schema with shared fields
-const baseUserSchema = new Schema({
+// Replace the entire file with this unified approach:
+const userSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -12,81 +11,45 @@ const baseUserSchema = new Schema({
     type: String,
     required: true,
   },
-  name: String,
-  phone: String,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
   role: {
     type: String,
     enum: ['buyer', 'seller'],
     required: true,
   },
-});
-
-// Buyer-specific schema
-const buyerSchema = new Schema({
-  // Add buyer-specific fields here
-  addresses: [
-    {
-      street: String,
-      city: String,
-      state: String,
-      postalCode: String,
-      country: String,
-      isDefault: Boolean,
-    },
-  ],
-  wishlist: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
-  orders: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Order',
-    },
-  ],
-});
-
-// Seller-specific schema
-const sellerSchema = new Schema({
-  // Add seller-specific fields here
-  gst: {
-    type: String,
-    required: true,
-  },
+  
+  // Buyer fields (conditional)
+  firstName: { type: String, required: function() { return this.role === 'buyer'; } },
+  lastName: { type: String, required: function() { return this.role === 'buyer'; } },
+  
+  // Seller fields (conditional)
+  businessName: { type: String, required: function() { return this.role === 'seller'; } },
+  gst: { type: String, required: function() { return this.role === 'seller'; } },
+  
+  // Shared optional fields
+  phone: String,
+  isVerified: { type: Boolean, default: false },
+  
+  // Buyer-specific arrays
+  addresses: [{
+    street: String,
+    city: String,
+    state: String,
+    postalCode: String,
+    country: String,
+    isDefault: Boolean,
+  }],
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
+  
+  // Seller-specific fields
   companyName: String,
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  stores: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Store',
-    },
-  ],
-  products: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
-  onboardingComplete: {
-    type: Boolean,
-    default: false,
-  },
+  stores: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Store' }],
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  onboardingComplete: { type: Boolean, default: false },
+  
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
-// Create models
-export const User = models.User || model('User', baseUserSchema);
-export const Buyer = models.Buyer || model('Buyer', buyerSchema);
-export const Seller = models.Seller || model('Seller', sellerSchema);
+// Remove the separate Buyer/Seller exports - use only:
+export const User = models.User || model('User', userSchema);

@@ -1,3 +1,4 @@
+// app/api/auth/seller/signup/step1/route.ts
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { User } from '@/models/UserSchema';
@@ -22,10 +23,16 @@ export async function POST(req: Request) {
     await connectDB();
     
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ 
+      $or: [
+        { email, role: 'seller' },
+        { phone, role: 'seller' }
+      ]
+    });
+    
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already in use' },
+        { error: 'Email or phone already in use' },
         { status: 409 }
       );
     }
@@ -39,15 +46,23 @@ export async function POST(req: Request) {
       );
     }
     
-    // Mark OTP as verified
-    otpRecord.verified = true;
-    await otpRecord.save();
+    // Mark OTP as verified and delete it
+    await OTP.deleteOne({ phone, code: otp });
     
-    // Generate a token for step 2
+    // Generate a temporary token for step 2 (valid for 10 minutes)
+    const tempToken = Buffer.from(JSON.stringify({
+      email,
+      phone,
+      gst,
+      timestamp: Date.now(),
+      expires: Date.now() + (10 * 60 * 1000) // 10 minutes
+    })).toString('base64');
+    
     return NextResponse.json(
       { 
         success: true,
         message: 'Step 1 completed successfully',
+        tempToken,
         validatedData: { email, phone, gst }
       },
       { status: 200 }
