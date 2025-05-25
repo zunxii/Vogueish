@@ -1,38 +1,44 @@
-'use client'
+'use client';
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { products } from '@/data/products'; // adjust path as needed
+
+  function getRandomProducts(arr, n) {
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, n);
+}
 
 const ProductGrid = () => {
-  const products = new Array(6).fill({
-    title: "Loro Piana",
-    subtitle: "Line-Blend Polo Shirt",
-    price: "699$",
-    img: "/white-tee.jpg"
-  });
-
+const randomProducts = getRandomProducts(products, 6);
   return (
     <section className="py-24 px-6 md:px-20 bg-[#fefefe]">
+    <h1 className="text-4xl font-serif font-semibold text-gray-900 tracking-wide leading-tight mb-10">
+        Featured Products
+      </h1>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {products.map((item, index) => (
-          <div
-            key={index}
-            className="rounded-xl shadow hover:shadow-md overflow-hidden bg-white"
+        {randomProducts.map((item) => (
+          <Link
+            key={item.slug}
+            href={`/shop/${item.slug}`}
+            className="rounded-xl shadow hover:shadow-md overflow-hidden bg-white block"
           >
             <div className="relative w-full h-80">
               <Image
-                src={item.img}
-                alt={item.title}
+                src={item.mainImage}
+                alt={item.name}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
               />
             </div>
             <div className="p-4">
-              <h4 className="font-medium text-base">{item.title}</h4>
-              <p className="text-sm text-neutral-600">{item.subtitle}</p>
-              <p className="font-semibold mt-2">{item.price}</p>
+              <h4 className="font-medium text-base">{item.name}</h4>
+              <p className="text-sm text-neutral-600">{item.description}</p>
+              <p className="font-semibold mt-2">{item.discountedPrice}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

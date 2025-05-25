@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { Cormorant_Garamond } from 'next/font/google';
+import Link from 'next/link';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -60,9 +61,11 @@ export default function AIRecommendationSection() {
 
       {/* CTA Button */}
       <div className="text-center mt-12 z-10 relative">
+        <Link href='/ai-bot'>
         <button className="inline-block bg-black text-white px-8 py-3 rounded-full tracking-wider uppercase hover:bg-neutral-800 transition-all duration-300">
           Start Chatting
         </button>
+        </Link>
       </div>
     </section>
   );

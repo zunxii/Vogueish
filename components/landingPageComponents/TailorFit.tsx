@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Scissors, Ruler, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { Cormorant_Garamond } from 'next/font/google';
+import Link from 'next/link';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -33,11 +34,11 @@ export default function TailorFitSection() {
           transition={{ duration: 1 }}
         >
           <Image
-            src="/tailor.jpg" // Optional: replace with an elegant tailoring studio or Italian atelier
+            src="/tailor.jpg" 
             alt="Tailor at work"
             width={600}
             height={800}
-            className="rounded-3xl shadow-2xl object-cover grayscale"
+            className="rounded-3xl shadow-2xl object-cover"
           />
         </motion.div>
 
@@ -76,15 +77,18 @@ export default function TailorFitSection() {
               </span>
             </div>
           </div>
-
+          <Link
+            href='/custom-tailoring'
+          >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => console.log('Book tailoring session')}
             className="mt-6 border border-black text-black py-3 px-10 rounded-full uppercase text-xs tracking-widest hover:bg-black hover:text-white transition-all duration-300 shadow-md"
           >
-            Book Your Tailoring
+            Learn More
           </motion.button>
+          </Link>
         </motion.div>
       </div>
     </section>

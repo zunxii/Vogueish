@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Home, ThumbsUp, PackageOpen } from 'lucide-react';
 import Image from 'next/image';
 import { Cormorant_Garamond } from 'next/font/google';
+import Link from 'next/link';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -16,7 +17,7 @@ export default function HomeTrialSection() {
       {/* Background accent */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/trial-bg.jpg" // Optional: use elegant lifestyle background (home fitting room, etc.)
+          src="/trial-bg.jpg" 
           alt="Home Trial Background"
           fill
           className="object-cover object-center opacity-10"
@@ -60,15 +61,18 @@ export default function HomeTrialSection() {
               </span>
             </div>
           </div>
-
+          <Link
+            href='/home-trials'
+          >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => console.log('Schedule home trial')}
             className="mt-6 border border-black text-black py-3 px-10 rounded-full uppercase text-xs tracking-widest hover:bg-black hover:text-white transition-all duration-300 shadow-md"
           >
-            Schedule a Home Trial
+            Learn more 
           </motion.button>
+          </Link>
         </motion.div>
 
         {/* Right Image */}
@@ -82,7 +86,7 @@ export default function HomeTrialSection() {
             alt="Try at home"
             width={600}
             height={800}
-            className="rounded-3xl shadow-2xl object-cover grayscale"
+            className="rounded-3xl shadow-2xl object-cover"
           />
         </motion.div>
       </div>
