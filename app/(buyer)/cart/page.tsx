@@ -5,7 +5,6 @@ import { useState } from "react";
 import CartHeader from "@/components/cart/CartHeader";
 import EmptyCart from "@/components/cart/EmptyCart";
 import CartItem from "@/components/cart/CartItem";
-import PromoCode from "@/components/cart/PromoCode";
 import OrderSummary from "@/components/cart/OrderSummary";
 import { useCart } from "@/hooks/useCart";
 

@@ -7,14 +7,14 @@ import { CartItem as CartItemType } from "@/types/cart";
 interface CartItemProps {
   item: CartItemType;
   onUpdateQuantity: (id: string, change: number) => void;
-  onRemoveItem: (id: string) => void;
+  removeItem: (id: string) => void;
   onMoveToWishlist: (item: CartItemType) => void;
 }
 
 export default function CartItem({ 
   item, 
   onUpdateQuantity, 
-  onRemoveItem, 
+  removeItem, 
   onMoveToWishlist 
 }: CartItemProps) {
   return (
@@ -52,7 +52,7 @@ export default function CartItem({
               <Heart className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onRemoveItem(item.id)}
+              onClick={() => removeItem(item.id)}
               className="p-1 text-gray-400 hover:text-red-600 transition-colors"
               title="Remove Item"
             >
