@@ -9,9 +9,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 export default function DashboardPage() {
   // const { data: session, status } = useSession();
   
-  if (status === "loading") {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
+  // if (status === "loading") {
+  //   return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  // }
   
   // if (status === "unauthenticated" || !session) {
   //   redirect("/seller-sign-in");
