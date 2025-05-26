@@ -231,9 +231,9 @@ export default function ProductPage() {
             </div>
 
             <div className="flex items-center gap-3 text-xl mt-3">
-              ₹{product.discountedPrice.toLocaleString()}
+              {product.discountedPrice.toLocaleString()}
               <span className="line-through text-gray-400 text-base">
-                ₹{product.realPrice.toLocaleString()}
+                {product.realPrice.toLocaleString()}
               </span>
               <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                 {Math.round(((product.realPrice - product.discountedPrice) / product.realPrice) * 100)}% OFF

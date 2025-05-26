@@ -6,14 +6,14 @@ import { CartItem as CartItemType } from "@/types/cart";
 
 interface CartItemProps {
   item: CartItemType;
-  onUpdateQuantity: (id: string, change: number) => void;
+  updateQuantity: (id: string, change: number) => void;
   removeItem: (id: string) => void;
   onMoveToWishlist: (item: CartItemType) => void;
 }
 
 export default function CartItem({ 
   item, 
-  onUpdateQuantity, 
+  updateQuantity, 
   removeItem, 
   onMoveToWishlist 
 }: CartItemProps) {
@@ -78,7 +78,7 @@ export default function CartItem({
           {/* Quantity Controls */}
           <div className="flex items-center border border-gray-300 rounded-md">
             <button
-              onClick={() => onUpdateQuantity(item.id, -1)}
+              onClick={() => updateQuantity(item.id, -1)}
               className="p-2 hover:bg-gray-50 transition-colors disabled:opacity-50"
               disabled={item.quantity <= 1}
             >
@@ -88,7 +88,7 @@ export default function CartItem({
               {item.quantity}
             </div>
             <button
-              onClick={() => onUpdateQuantity(item.id, 1)}
+              onClick={() => updateQuantity(item.id, 1)}
               className="p-2 hover:bg-gray-50 transition-colors"
             >
               <Plus className="w-4 h-4 text-gray-600" />
@@ -98,7 +98,7 @@ export default function CartItem({
           {/* Price and Stock */}
           <div className="text-right">
             <div className="text-lg font-semibold text-gray-900">
-              ₹{(item.price * item.quantity).toLocaleString()}
+              ₹{(item.realPrice * item.quantity).toLocaleString()}
             </div>
             <div className={`text-xs mt-1 ${item.inStock ? 'text-green-600' : 'text-red-600'}`}>
               {item.inStock ? 'In Stock' : 'Out of Stock - Will ship when available'}

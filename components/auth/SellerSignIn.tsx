@@ -5,12 +5,20 @@ import { buyerSignInSchema } from "@/schemas/authSchema";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-const SellerSignIn = () => {
-  const { sellerSignIn, isLoading, error } = useAuth();
+// Demo credentials
+const DEMO_CREDENTIALS = {
+  email: "himanshikathuria64@gmail.com",
+  password: "vogueish05"
+};
+
+const SellerSignIn = () => { 
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof buyerSignInSchema>>({
     resolver: zodResolver(buyerSignInSchema),
@@ -20,12 +28,27 @@ const SellerSignIn = () => {
     },
   });
 
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/seller-dashboard");
+    }
+  }, [isAuthenticated, router]);
+
   const onSubmit = async (data: z.infer<typeof buyerSignInSchema>) => {
     setAuthError(null);
-    const result = await sellerSignIn(data);
-    if (!result && error) {
-      setAuthError(error);
-    }
+    setIsLoading(true);
+    
+    // Simulate loading
+    setTimeout(() => {
+      // Check credentials
+      if (data.email === DEMO_CREDENTIALS.email && data.password === DEMO_CREDENTIALS.password) {
+        setIsAuthenticated(true); // Set authentication state
+      } else {
+        setAuthError("Invalid email or password");
+      }
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (

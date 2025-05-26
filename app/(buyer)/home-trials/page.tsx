@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Home, ThumbsUp, PackageOpen, Star } from 'lucide-react';
 import Image from 'next/image';
 import { Cormorant_Garamond } from 'next/font/google';
+import Link from 'next/link';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -115,12 +116,12 @@ export default function HomeTrialPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {[
               {
-                name: 'Isabelle M.',
+                name: 'Sofia Saifi.',
                 quote:
                   "I’ve never felt more pampered — the pieces were exquisite, and the process was seamless.",
               },
               {
-                name: 'Chloe R.',
+                name: 'Priya Singh',
                 quote:
                   "It’s like a personal stylist delivered straight to my home. Absolutely loved the experience.",
               },
@@ -150,6 +151,7 @@ export default function HomeTrialPage() {
 
         {/* Final CTA */}
         <div className="text-center mt-20">
+          <Link href='/shop'>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -157,6 +159,7 @@ export default function HomeTrialPage() {
           >
             Check Out our Store
           </motion.button>
+          </Link>
         </div>
       </section>
     </main>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scissors, Ruler, ShieldCheck, Clock, Award, Users, ArrowRight, Play, Quote, Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const TailoringPage = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -42,20 +43,20 @@ const TailoringPage = () => {
 
   const testimonials = [
     {
-      name: "Alexander Hartwell",
-      role: "CEO, Fortune 500",
+      name: "Krishna Sahay",
+      role: "Customer",
       quote: "The attention to detail is extraordinary. Every piece fits like it was made for me—because it was.",
       rating: 5
     },
     {
-      name: "Victoria Sterling",
-      role: "Fashion Director",
+      name: "Priya Singh ",
+      role: "Fashion Designer",
       quote: "Impeccable craftsmanship that rivals the finest European ateliers. Truly exceptional.",
       rating: 5
     },
     {
-      name: "Marcus Chen",
-      role: "Investment Banking",
+      name: "Sofia Saifi",
+      role: "Customer",
       quote: "The quality and service exceeded every expectation. This is luxury tailoring at its finest.",
       rating: 5
     }
@@ -89,10 +90,12 @@ const TailoringPage = () => {
               every fit speaks of sophistication.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link href='/shop'>
               <button className="group bg-black text-white px-12 py-4 hover:bg-gray-800 transition-all duration-300 flex items-center gap-3 text-lg">
                 Begin Your Journey
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
+              </Link>
               <button 
                 onClick={() => setIsVideoPlaying(true)}
                 className="group flex items-center gap-3 text-lg text-gray-700 hover:text-black transition-colors"
@@ -289,13 +292,12 @@ const TailoringPage = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <button className="group bg-black text-white px-12 py-4 hover:bg-gray-800 transition-all duration-300 flex items-center gap-3 text-lg">
-              Shop Now
+            <Link href='/shop'>
+            <button className="border-2 flex items-center gap-5 border-gray-300 text-gray-700 px-12 py-4 hover:border-black hover:text-black transition-all duration-300 text-lg">
+              View Our Gallery
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="border-2 border-gray-300 text-gray-700 px-12 py-4 hover:border-black hover:text-black transition-all duration-300 text-lg">
-              View Our Gallery
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">

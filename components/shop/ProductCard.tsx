@@ -68,11 +68,11 @@ export default function ProductCard({
               
               <div className="flex items-center gap-3">
                 <span className="font-bold text-xl text-gray-900">
-                  ₹{product.discountedPrice.toLocaleString()}
+                  {product.discountedPrice.toLocaleString()}
                 </span>
                 {discountPercentage > 0 && (
                   <span className="text-sm text-gray-500 line-through">
-                    ₹{product.realPrice.toLocaleString()}
+                    {product.realPrice.toLocaleString()}
                   </span>
                 )}
               </div>

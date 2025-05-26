@@ -139,98 +139,101 @@ export default function CartPage() {
   );
 
   // Home Trial card JSX
-  const HomeTrialCard = () => {
-    const timeSlots = [
-      { value: "morning", label: "Morning", time: "9 AM - 12 PM", icon: "🌅" },
-      { value: "afternoon", label: "Afternoon", time: "12 PM - 3 PM", icon: "☀️" },
-      { value: "evening", label: "Evening", time: "4 PM - 7 PM", icon: "🌆" },
-    ];
+const HomeTrialCard = () => {
+  const timeSlots = [
+    { value: "morning", label: "Morning", time: "9 AM - 12 PM", icon: "🌅" },
+    { value: "afternoon", label: "Afternoon", time: "12 PM - 3 PM", icon: "☀️" },
+    { value: "evening", label: "Evening", time: "4 PM - 7 PM", icon: "🌆" },
+  ];
 
-    return (
-      <div
-        className={`relative p-5 rounded-xl border-2 transition-all duration-300 ${
-          homeTrial ? "border-purple-400 bg-purple-50 shadow-md" : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
-        }`}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-purple-100">
-                <svg
-                  className="w-5 h-5 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Home Trial</h4>
-                <p className="text-sm text-gray-600">Try before you buy</p>
-              </div>
+  return (
+    <div
+      className={`relative p-4 sm:p-5 rounded-xl border-2 transition-all duration-300 ${
+        homeTrial
+          ? "border-purple-400 bg-purple-50 shadow-md"
+          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+      }`}
+    >
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+        <div className="flex-1">
+          <div className="flex items-start gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-purple-100">
+              <svg
+                className="w-5 h-5 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"
+                />
+              </svg>
             </div>
-            <p className="text-sm text-gray-700 mb-3">
-              Experience our outfits in the comfort of your home. Return what doesn&apos;t fit perfectly.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">Free service</span>
-              <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">3-day trial</span>
+            <div>
+              <h4 className="font-semibold text-gray-900">Home Trial</h4>
+              <p className="text-sm text-gray-600">Try before you buy</p>
             </div>
           </div>
-          <div className="ml-4">
-            <ToggleSwitch
-              enabled={homeTrial}
-              onToggle={() => setHomeTrial(!homeTrial)}
-              colorClass="bg-purple-600 focus:ring-purple-500"
-            />
+          <p className="text-sm text-gray-700 mb-3">
+            Experience our outfits in the comfort of your home. Return what doesn&apos;t fit perfectly.
+          </p>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">Free service</span>
+            <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">3-day trial</span>
           </div>
         </div>
-
-        {homeTrial && (
-          <div className="mt-4 pt-4 border-t border-purple-200 animate-in slide-in-from-top-2 duration-200">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Choose your preferred trial time slot
-            </label>
-            <div className="flex gap-4">
-              {timeSlots.map(({ value, label, time, icon }) => (
-                <button
-                  key={value}
-                  onClick={() => setTrialSlot(value)}
-                  type="button"
-                  className={`flex items-center gap-3 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors focus:outline-none ${
-                    trialSlot === value
-                      ? "bg-purple-600 text-white border-transparent shadow"
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-purple-50 hover:border-purple-400"
-                  }`}
-                >
-                  <span className="text-lg">{icon}</span>
-                  <div className="text-left">
-                    <p>{label}</p>
-                    <p className="text-xs text-purple-300">{time}</p>
-                  </div>
-                  {trialSlot === value && (
-                    <Check className="ml-auto text-white" size={20} />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="sm:ml-4">
+          <ToggleSwitch
+            enabled={homeTrial}
+            onToggle={() => setHomeTrial(!homeTrial)}
+            colorClass="bg-purple-600 focus:ring-purple-500"
+          />
+        </div>
       </div>
-    );
-  };
+
+      {homeTrial && (
+        <div className="mt-4 pt-4 border-t border-purple-200 animate-in slide-in-from-top-2 duration-200">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Choose your preferred trial time slot
+          </label>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {timeSlots.map(({ value, label, time, icon }) => (
+              <button
+                key={value}
+                onClick={() => setTrialSlot(value)}
+                type="button"
+                className={`flex w-full sm:w-auto items-center gap-3 rounded-lg border px-4 py-3 text-sm font-semibold transition-colors focus:outline-none ${
+                  trialSlot === value
+                    ? "bg-purple-600 text-white border-transparent shadow"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-purple-50 hover:border-purple-400"
+                }`}
+              >
+                <span className="text-lg">{icon}</span>
+                <div className="text-left">
+                  <p>{label}</p>
+                  <p className="text-xs text-purple-300">{time}</p>
+                </div>
+                {trialSlot === value && (
+                  <Check className="ml-auto text-white" size={20} />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 
   if (cart.length === 0) {
     return <EmptyCart />;

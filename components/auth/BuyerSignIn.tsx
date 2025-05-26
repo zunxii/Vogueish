@@ -4,54 +4,65 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { buyerSignInSchema, BuyerSignInData } from "@/schemas/authSchema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+// Demo credentials
+const DEMO_CREDENTIALS = {
+  email: "himanshikathuria64@gmail.com",
+  password: "vogueish05"
+};
 
 const BuyerSignIn = () => {
-  const { buyerSignIn, isLoading, error, clearError } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const {
-    register,
+    register, 
     handleSubmit,
     formState: { errors },
-    setError,
+    setError: setFormError,
     clearErrors,
   } = useForm<BuyerSignInData>({
     resolver: zodResolver(buyerSignInSchema),
   });
 
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/shop");
+    }
+  }, [isAuthenticated, router]);
+
   const onSubmit = async (data: BuyerSignInData) => {
     console.log("Buyer Sign In", data);
     setIsSubmitting(true);
-    clearError();
+    setError("");
     clearErrors();
 
-    try {
-      const result = await buyerSignIn(data.email, data.password);
-
-      if (!result.success && result.error) {
-        // Handle specific errors
-        if (result.error.includes("No buyer found")) {
-          setError("email", { 
+    // Simulate loading
+    setTimeout(() => {
+      // Check credentials
+      if (data.email === DEMO_CREDENTIALS.email && data.password === DEMO_CREDENTIALS.password) {
+        setIsAuthenticated(true); // Set authentication state
+      } else {
+        if (data.email !== DEMO_CREDENTIALS.email) {
+          setFormError("email", { 
             type: "manual", 
             message: "No account found with this email" 
           });
-        } else if (result.error.includes("Invalid password")) {
-          setError("password", { 
+        } else if (data.password !== DEMO_CREDENTIALS.password) {
+          setFormError("password", { 
             type: "manual", 
             message: "Incorrect password" 
           });
         }
-        // Generic error will be shown from useAuth hook
       }
-      // Success case is handled in useAuth hook (redirect to /shop)
-    } catch (err) {
-      console.error("Sign in error:", err);
-    } finally {
       setIsSubmitting(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -90,9 +101,9 @@ const BuyerSignIn = () => {
         <Button 
           type="submit" 
           className="w-full"
-          disabled={isLoading || isSubmitting}
+          disabled={isSubmitting}
         >
-          {isLoading || isSubmitting ? (
+          {isSubmitting ? (
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
               Signing in...

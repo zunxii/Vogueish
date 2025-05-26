@@ -46,7 +46,7 @@ export default function HeroSection() {
           transition={{ duration: 1.2 }}
           className={`text-xl md:text-2xl italic text-neutral-800 ${cormorant.className}`}
         >
-          Editorial elegance for the woman who turns pages and heads.
+          Fashion & elegance for the ones who turns pages and heads.
         </motion.p>
 
         {/* Chic USP Highlights */}
